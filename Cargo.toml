@@ -1,0 +1,19 @@
+[package]
+name = "csv-cat"
+version = "0.1.0"
+edition = "2024"
+description = "CSV processing built on comp-cat-rs: streaming, resource-safe, composable effects"
+license = "MIT"
+keywords = ["csv", "effects", "streaming", "category-theory", "functional"]
+categories = ["parser-implementations", "encoding"]
+
+[dependencies]
+comp-cat-rs = "0.2"
+csv = "1"
+serde = { version = "1", features = ["derive"] }
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = "warn"
+needless_pass_by_value = "warn"
+manual_map = "warn"
