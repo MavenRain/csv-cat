@@ -1,6 +1,6 @@
 [package]
 name = "csv-cat"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "CSV processing built on comp-cat-rs: streaming, resource-safe, composable effects"
 license = "MIT"
@@ -8,7 +8,7 @@ keywords = ["csv", "effects", "streaming", "category-theory", "functional"]
 categories = ["parser-implementations", "encoding"]
 
 [dependencies]
-comp-cat-rs = "0.2"
+comp-cat-rs = "0.5"
 csv = "1"
 serde = { version = "1", features = ["derive"] }
 

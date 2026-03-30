@@ -3,7 +3,7 @@
 //! The reader wraps `csv::Reader` and exposes rows as a
 //! `comp-cat-rs` `Stream`, with file lifecycle managed by `Resource`.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use comp_cat_rs::effect::io::Io;
 use comp_cat_rs::effect::resource::Resource;
@@ -171,7 +171,7 @@ trait StreamFlatMapInner {
 impl StreamFlatMapInner for Stream<CsvError, Vec<Row>> {
     fn flat_map_inner(self) -> Stream<CsvError, Row> {
         // Collect the single Vec<Row> and turn it into a row stream.
-        let io = self.fold(Vec::new(), Rc::new(|acc, rows| {
+        let io = self.fold(Vec::new(), Arc::new(|acc: Vec<Row>, rows: Vec<Row>| {
             acc.into_iter().chain(rows).collect()
         }));
         Stream::from_io(io.map(|rows| {
@@ -191,7 +191,7 @@ impl StreamFlatMapInnerNested for Stream<CsvError, Stream<CsvError, Row>> {
     fn flat_map_inner_nested(self) -> Stream<CsvError, Row> {
         // For the single-element case, just extract the inner stream.
         Stream::from_io(
-            self.fold(Stream::empty(), Rc::new(|_acc, inner| inner))
+            self.fold(Stream::empty(), Arc::new(|_acc: Stream<CsvError, Row>, inner: Stream<CsvError, Row>| inner))
                 .flat_map(Io::pure)
         ).flat_map_inner_final()
     }
@@ -206,7 +206,7 @@ impl StreamFlatMapInnerFinal for Stream<CsvError, Stream<CsvError, Row>> {
         // Just use the fold to extract the single stream.
         // This is a pragmatic simplification.
         Stream::from_io(
-            self.fold(Vec::new(), Rc::new(|acc, inner| {
+            self.fold(Vec::new(), Arc::new(|acc: Vec<Row>, inner: Stream<CsvError, Row>| {
                 let collected = inner.collect().run().unwrap_or_default();
                 acc.into_iter().chain(collected).collect()
             }))
